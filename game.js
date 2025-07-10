@@ -1,6 +1,10 @@
 // game.js
-let level = 1;
-let winnings = 0;
+let level = 0;
+let totalWinnings = 0;
+let upThreshold = 4;
+let stayMin = 2;
+let currentCashOut = 0;
+
 
 function rollDice(numDice) {
   const rolls = [];
@@ -10,7 +14,7 @@ function rollDice(numDice) {
   const avg = rolls.reduce((a, b) => a + b, 0) / numDice;
   document.getElementById("last-roll").textContent = rolls.join(", ");
 
-  const result = checkResult(avg, level);
+  const result = checkResult(avg);
 
   if (result === "up") {
     level++;
@@ -19,22 +23,22 @@ function rollDice(numDice) {
     document.getElementById("outcome").textContent = "You stayed at the same level.";
   } else {
     document.getElementById("outcome").textContent = "You fell! Game over.";
-    winnings = 0;
-    disableButtons();
+    level -= 2;
   }
   updateUI();
 }
 
-function checkResult(avg, level) {
-  if (avg >= 4.5 + level * 0.1) return "up";
-  else if (avg >= 2.5 + level * 0.1) return "stay";
+function checkResult(avg) {
+  if (avg >= upThreshold) return "up";
+  else if (avg <= stayMin) return "stay";
   else return "fall";
 }
 
 function cashOut() {
   winnings = level * 5;
   document.getElementById("outcome").textContent = `You cashed out with $${winnings}!`;
-  disableButtons();
+  level = 0;
+
   updateUI();
 }
 
