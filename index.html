@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Climb & Cash</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="game-container">
+    <h1>Climb & Cash</h1>
+    <p>Level: <span id="level">1</span></p>
+    <p>Last Roll: <span id="last-roll">-</span></p>
+    <p>Outcome: <span id="outcome">-</span></p>
+    <p>Winnings: $<span id="winnings">0</span></p>
+
+    <div class="buttons">
+      <button onclick="rollDice(1)">Roll 1 Die</button>
+      <button onclick="rollDice(2)">Roll 2 Dice</button>
+      <button onclick="rollDice(3)">Roll 3 Dice</button>
+      <button onclick="cashOut()">Cash Out</button>
+      <button onclick="resetGame()">Reset Game</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
