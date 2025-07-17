@@ -4,65 +4,79 @@ import ThresholdsDisplay from "./ThresholdsDisplay";
 import GameInfo from "./GameInfo";
 import DiceButtons from "./DiceButtons";
 
+    // TODO: 
+    // 1. add win and loss conditions
+    // 2. add roll and climb animations
+    // 3. add conditions based on number of levels climbed. Ex. if fell more than 2 levels, broken leg, reduce up levels temporarily
+    
 export default function App() {
   const [level, setLevel] = useState(0);
   const [winnings, setWinnings] = useState(0);
-  const [currentCashOut, setCurrentCashOut] = useState(0);
-  const [lastRoll, setLastRoll] = useState<number[]>([]);
-  const [minAvgToClimb, setMinAvgToClimb] = useState(4.5);
-  const [minAvgToStay, setMinAvgToStay] = useState(2.5);
+  const [lastRoll, setLastRoll] = useState(0);
+  const [threshold, setThreshold] = useState(0);
+  const [win, setWin] = useState(0);
+  const [loss, setLoss] = useState(0);
   const [message, setMessage] = useState("Start rolling!");
+  const [prevThreshold, setPrevThreshold] = useState(0);
 
   useEffect(() => {
-    // Generate new thresholds each level
-    // const climb = +(Math.random() * 0.6 + 4.4).toFixed(2); // 4.4 - 5.0
-    // const stay = +(Math.random() * 0.6 + 2.4).toFixed(2); // 2.4 - 3.0
-    const climb = 4;
-    const stay = 2.5;
-    setMinAvgToClimb(climb);
-    setMinAvgToStay(stay);
-  }, [level]);
+    setThreshold(getRandomThreshold());
+    setWin(getRandomWin());
+    setLoss(getRandomLoss());
+    reset();
+  }, []);
 
-  const rollDice = (numDice: number) => {
-    const rolls = Array.from({ length: numDice }, () => Math.floor(Math.random() * 6 + 1));
-    const avg = rolls.reduce((a, b) => a + b, 0) / numDice;
-    setLastRoll(rolls);
-
-    if (avg >= minAvgToClimb) {
-      setLevel((prev) => prev + 1);
-      setCurrentCashOut((prev) => prev + 5);
-      setMessage("You climbed to the next level!");
-    } else if (avg >= minAvgToStay) {
-      setMessage("You stayed on the same level.");
-    } else {
-      const newLevel = level - 2;
-      setLevel(newLevel);
-      setCurrentCashOut(newLevel * 5);
-      setMessage("You fell! Dropped 2 levels.");
-    }
+  const getRandomThreshold = () => {
+    return Math.floor(Math.random() * 5) + 2;
   };
 
-  const cashOut = () => {
-    setWinnings(winnings + currentCashOut);
-    setCurrentCashOut(0);
-    setLevel(0);
-    setLastRoll([]);
-    setMessage(`You cashed out with $${currentCashOut}! Start rolling again!`);
+  const getRandomWin = () => {
+    return Math.floor(Math.random() * 3) + 1;
   };
+
+  const getRandomLoss = () => {
+    return (Math.floor(Math.random() * 3) + 1) * -1;
+  };
+  
+  const rollDice = () => {
+    setPrevThreshold(threshold);
+    const diceRoll = Math.floor(Math.random() * 6) + 1;
+    setLastRoll(diceRoll);
+
+    setLevel((prevLevel) => {
+      const newLevel = diceRoll >= threshold ? prevLevel + win : prevLevel + loss;
+      setWinnings(newLevel * 5);
+      return newLevel;
+    });
+
+    setMessage(diceRoll >= threshold ? "You climbed!" : "You fell!");
+    setThreshold(getRandomThreshold());
+    setWin(getRandomWin());
+    setLoss(getRandomLoss());
+  };
+
+  const wait = () => {
+    setLastRoll(0);
+    setPrevThreshold(threshold);
+    setThreshold(getRandomThreshold());
+    setWin(getRandomWin());
+    setLoss(getRandomLoss());
+  }
 
   const reset = () => {
     setLevel(0);
+    setPrevThreshold(0);
+    setLastRoll(0);
     setWinnings(0);
-    setLastRoll([]);
     setMessage("Start rolling!");
   };
 
   return (
     <div className="p-4 max-w-md mx-auto text-center">
       <Header />
-      <ThresholdsDisplay minAvgToClimb={minAvgToClimb} minAvgToStay={minAvgToStay} />
-      <GameInfo level={level} lastRoll={lastRoll} message={message} winnings={winnings} />
-      <DiceButtons rollDice={rollDice} cashOut={cashOut} reset={reset} />
+      <ThresholdsDisplay threshold={threshold} win={win} loss={loss} />
+      <GameInfo level={level} lastRoll={lastRoll} prevThreshold={prevThreshold} message={message} winnings={winnings} />
+      <DiceButtons rollDice={rollDice} cashOut={wait} reset={reset} />
     </div>
   );
 }

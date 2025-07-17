@@ -1,10 +1,9 @@
-export default function ThresholdsDisplay({ minAvgToClimb, minAvgToStay}: { minAvgToClimb: number, minAvgToStay: number }) {
+export default function ThresholdsDisplay({ threshold, win, loss}: { threshold: number, win: number, loss: number }) {
   return (
     <div>
-      <h3>🎯 Thresholds:</h3>
-      <p>🧗 Climb if avg ≥ {minAvgToClimb}</p>
-      <p>😐 Stay if {minAvgToClimb} &gt; avg &gt; {minAvgToStay}</p>
-      <p>💀 Fall if avg ≤ {minAvgToStay}</p>
+      <p>🎯 Level Threshold: {threshold}</p>
+      <p>🧗 Climb: {win} levels</p>
+      <p>💀 Fall {loss} levels</p>
     </div>
   );
 }
